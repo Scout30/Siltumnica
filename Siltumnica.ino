@@ -155,6 +155,7 @@ void Ekrans(){
       break;  
     case Temperatura:
       Zime_Temperatura();
+      break;
     case Suknis:
       Zime_Suknis();
       break;
@@ -292,7 +293,7 @@ void  Zime_Laiku(String virsraksts, Menu_Izvelnes ativaizvelne, int stundas, int
         }
 
     } else {
-      MainaKursoraPozicijuLoga(3);
+      MainaKursoraPozicijuLoga(2);
     }
 
 if (
@@ -350,18 +351,18 @@ if (
 void  ZemesMitrums_OnClick(){     
    switch(pozicija){
         case 0:  //Atgriežamies neko nesaglabājot
-          Menu_AktivaIzvelne=Galvena;        
+          Menu_AktivaIzvelne=Galvena;       
         
           break;
-        case 1:        
-       
-           if(laboPoziciju){
-              pozicija++; //Ejam tālāk +/- nobīdi
-            } else {
-              laboPoziciju=true;
+        
+        case 1: 
+          laboPoziciju=!laboPoziciju;
+          counter=0;
+            if(laboPoziciju){
               lcd.blink();
-            }          
-            counter=0;          
+            } else {
+              lcd.noBlink();
+            } 
           break;
        
         case 2: // Saglabā ja ir OK
@@ -415,7 +416,7 @@ void  Zime_ZemesMitrums(){
         
             lcd.setCursor(0,0);
             lcd.write(byte(BultaAtpakal));
-            lcd.print(" Zemes mirums  ");   
+            lcd.print(" Zemes mitrums  ");   
 
             lcd.setCursor(15,0);
             lcd.write(byte(Zivs));        
@@ -423,7 +424,7 @@ void  Zime_ZemesMitrums(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>3 && pozicija<0){
+    if(pozicija>2 && pozicija<0){
         pozicija=0;
       }
        
@@ -447,7 +448,7 @@ void  Zime_ZemesMitrums(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(3);    
+      MainaKursoraPozicijuLoga(2);    
     }
  
 
@@ -460,7 +461,7 @@ if (
       pozicijaVeca=pozicija;        
 
         lcd.setCursor(0,1);
-        lcd.print("       %          ");
+        lcd.print("     %          ");
         lcd.setCursor(1,1);
         lcd.print(skaitlis1);
         
@@ -490,17 +491,18 @@ void  GaisaMitrums_OnClick(){
           Menu_AktivaIzvelne=Galvena;        
         
           break;
-        case 1:        
+ 
        
-           if(laboPoziciju){
-              pozicija++; //Ejam tālāk +/- nobīdi
-            } else {
-              laboPoziciju=true;
+        case 1: 
+          laboPoziciju=!laboPoziciju;
+          counter=0;
+            if(laboPoziciju){
               lcd.blink();
-            }          
-            counter=0;          
+            } else {
+              lcd.noBlink();
+            } 
           break;
-       
+
         case 2: // Saglabā ja ir OK
           laboPoziciju=false;
           if( skaitlis1>=0 && skaitlis1<=100 
@@ -552,7 +554,7 @@ void  Zime_GaisaMitrums(){
         
             lcd.setCursor(0,0);
             lcd.write(byte(BultaAtpakal));            
-            lcd.print(" Gaisa mirums  ");   
+            lcd.print(" Gaisa mitrums  ");   
 
             lcd.setCursor(15,0);
             lcd.write(byte(Zivs));        
@@ -560,7 +562,7 @@ void  Zime_GaisaMitrums(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>3 && pozicija<0){
+    if(pozicija>2 && pozicija<0){
         pozicija=0;
       }
        
@@ -584,7 +586,7 @@ void  Zime_GaisaMitrums(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(3);    
+      MainaKursoraPozicijuLoga(2);    
     }
  
 
@@ -597,7 +599,7 @@ if (
       pozicijaVeca=pozicija;        
 
         lcd.setCursor(0,1);
-        lcd.print("       %          ");
+        lcd.print("     %          ");
         lcd.setCursor(1,1);
         lcd.print(skaitlis1);
         
@@ -627,16 +629,17 @@ void  Suknis_OnClick(){
           Menu_AktivaIzvelne=Galvena;        
         
           break;
-        case 1:        
-       
-           if(laboPoziciju){
-              pozicija++; //Ejam tālāk +/- nobīdi
-            } else {
-              laboPoziciju=true;
+        
+        case 1: 
+          laboPoziciju=!laboPoziciju;
+          counter=0;
+            if(laboPoziciju){
               lcd.blink();
-            }          
-            counter=0;          
+            } else {
+              lcd.noBlink();
+            } 
           break;
+
        
         case 2: // Saglabā ja ir OK
           laboPoziciju=false;
@@ -701,7 +704,7 @@ void  Zime_Suknis(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>3 && pozicija<0){
+    if(pozicija>2 && pozicija<0){
         pozicija=0;
       }
        
@@ -725,7 +728,7 @@ void  Zime_Suknis(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(3);    
+      MainaKursoraPozicijuLoga(2);    
     }
  
 
@@ -738,7 +741,7 @@ if (
       pozicijaVeca=pozicija;        
 
         lcd.setCursor(0,1);        
-        lcd.print("       sekundes   ");
+        lcd.print("     sekundes   ");
         lcd.setCursor(1,1);
         lcd.print(skaitlis1);
         
@@ -864,7 +867,7 @@ void  Zime_Temperatura(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>4 && pozicija<0){
+    if(pozicija>3 && pozicija<0){
         pozicija=0;
       }
        
@@ -899,7 +902,7 @@ void  Zime_Temperatura(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(4);    
+      MainaKursoraPozicijuLoga(3);    
     }
  
 
