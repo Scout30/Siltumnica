@@ -72,19 +72,19 @@ float tempKaste;
 bool tempTrauksme=false;
 float temperaturaIstaba=0;
 float mitrumsIstaba=0;
-int pedejaLaistisana = 0;
+//int pedejaLaistisana = 0;
 bool fan = false;
 int dienaaktsDala=0;
 bool silditajs=false;
 unsigned long gaismaEkranam=0;
-bool fonaGaisma=0;
-bool fonaGaismaUzstaditaVertiba=false;
-bool trauksme=0;
+//bool fonaGaisma=0;
+//bool fonaGaismaUzstaditaVertiba=false;
+//bool trauksme=0;
 
 
 
 
-DateTime PedejaLaistisana;
+//DateTime PedejaLaistisana;
 DateTime now;
 
 //**********************************************************     EEPROM atminā sablabājamā parametru struktūra        *********************************************************************************************//
@@ -1477,13 +1477,13 @@ void  ZimePamatlogu(){
   displajaLaikaApdeitsVeiks=mi;  
 
 // Fona gaismas uztādīšana
-if(gaismaEkranam> mi  ){
+/*if(gaismaEkranam> mi  ){
   //Nav pienāci laiks aptumšot ekrānu vai trauksme
   fonaGaisma=true;
   } else {
     fonaGaisma=false;
   }
-
+*/
   //Zīmē laiku
   uint16_t gads=now.year()-2000;
   uint8_t menesis=now.month();
@@ -1531,36 +1531,36 @@ if(gaismaEkranam> mi  ){
 //*********************************************************  Poga_OnClick *******************************************************************************//
 //Vadības pogas klikška apstrāda atbilstoši iekārtas stāvoklim
 void Poga_OnClick(){
-  if(!fonaGaisma){
+/* if(!fonaGaisma){
     gaismaEkranam= millis() + 120000; //Ieslēdzam ekrāna gaismu uz 120 sekundēm   
-  }
+  }*/
   switch(Menu_AktivaIzvelne){
     case Galvena:
        Menu_AktivaIzvelne=Menu;
        return;
     case DatumsLaiks:
         DatumsUnLaiks_OnClick();
-        fonaGaisma=true;
+     //   fonaGaisma=true;
         return;
     case Nakts:
        Nakts_OnClick();
-        fonaGaisma=true;
+      //  fonaGaisma=true;
        return;
     case Diena:
        Diena_OnClick();
-       fonaGaisma=true;
+      // fonaGaisma=true;
        return;
     case ZemesMitrums:
        ZemesMitrums_OnClick();
-        fonaGaisma=true;
+      //  fonaGaisma=true;
         return;
     case  GaisaMitrums:
         GaisaMitrums_OnClick();
-        fonaGaisma=true;
+      // fonaGaisma=true;
         return;
     case Temperatura:
       Temperatura_OnClick();
-       fonaGaisma=true;
+      // fonaGaisma=true;
       return;
     case Menu:
     /*  DatumsLaiks=10,
@@ -1923,10 +1923,9 @@ void DHT_setup() {
 
 static bool measure_environment() {
   //https://github.com/adafruit/DHT-sensor-library/blob/master/examples/DHT_Unified_Sensor/DHT_Unified_Sensor.ino
-    static unsigned long measurement_timestamp = millis();
-       
+    static unsigned long measurement_timestamp = millis();       
 
-    if (millis() - measurement_timestamp > 8000ul) {
+    if (millis() - measurement_timestamp > 40000ul) {
         
         sensor_t sensor;      
         dht.humidity().getSensor(&sensor); 
@@ -1958,7 +1957,7 @@ static bool measure_environment() {
  int btnStateLast=0;  
  unsigned long lastButtonPress = 0;
 
- bool Enkoders () {
+ bool Enkoders() {
   // Izmantos paraugs no https://lastminuteengineers.com/rotary-encoder-arduino-tutorial/
     // Read the button state
     int btnState = digitalRead(Enkoders_SW);
@@ -2021,11 +2020,12 @@ int beigtSuknet=-100;
 
 void DarbibuIeslegsana() 
 {
+
    int minutesNoDienasSakuma = now.hour()*60 + now.minute();
    int sekuundesNoDienasSakuma =minutesNoDienasSakuma *60 + now.second();
     //giasma
     bool auguGaisma = false; 
-     bool ventilators = false; 
+    bool ventilators = false; 
    
 
     if( parametri.Diena_Stundas*60 +  parametri.Diena_Minutes< minutesNoDienasSakuma ){  
@@ -2147,9 +2147,9 @@ sensors.begin();
 
 //Sākuma stavokļi mainīgajiem
 tempKaste=0;
-PedejaLaistisana=new DateTime();
-fonaGaisma=false;
-fonaGaismaUzstaditaVertiba=true;
+//PedejaLaistisana=new DateTime();
+//fonaGaisma=false;
+//fonaGaismaUzstaditaVertiba=true;
 
  
  // DHT nedarbojas, iespējams sensora bojājuma dēļ, tādēļ izkomentēts
@@ -2185,14 +2185,14 @@ DarbibuIeslegsana();
 
  
 //  Izkoomentēts, lai prezentējot prototipu neizslēgtos ekrana apgasmojums
- 
+ /*
  //Maina fona gaismu, ja tā nav uztādīta atbilstoši vajadzībai
   if(fonaGaisma){
       lcd.backlight();
   } else {
      lcd.noBacklight();
   }
- 
+ */
  
  
  
