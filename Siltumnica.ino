@@ -101,9 +101,8 @@ struct Parametri{
   
   float Temp=19;  
   uint8_t SuknisOn = 10;
-
-
-  float TempTrauksme=4;
+  float TempTrauksme=4;  
+  int SausSensors=300;
   uint32_t versija=ParametruVersija;
 };
 
@@ -121,8 +120,9 @@ enum Menu_Izvelnes{
   GaisaMitrums=50,
   Temperatura=60,
   Suknis=70,
+  SausSensors=80
 };
-#define  ZimejamieMenuci 8 // Darbību skaits izvēlnēs
+#define  ZimejamieMenuci 9 // Darbību skaits izvēlnēs
 
 Menu_Izvelnes Menu_AktivaIzvelne=Galvena;
 Menu_Izvelnes Menu_IeprieksejaIzvelne=-1;
@@ -134,7 +134,12 @@ int Menu_MaxVertiba=0;
 int ZemesMitrumaNolasisana() {
   int dati = analogRead(zemesMitrumaPins); // 0-1023
   
-  int procents = map(dati, 1023/*max vētība*/, 300 /* saus sensors */, 0 /*%*/, 100/*%*/); 
+  int sausaSensoraVertiba= parametri.SausSensors;
+  if(sausaSensoraVertiba>10230 || sausaSensoraVertiba<0){
+    sausaSensoraVertiba=150;
+  }
+
+  int procents = map(dati, 1023/*max vētība*/, sausaSensoraVertiba /*300 saus sensors */, 0 /*%*/, 100/*%*/); 
   if (procents < 0) procents = 0;
   if (procents > 100) procents = 100;
   return procents;
@@ -170,6 +175,9 @@ void Ekrans(){
       break;
     case Suknis:
       Zime_Suknis();
+      break;
+    case SausSensors:
+      Zime_SausSensors();
       break;
 
     default:
@@ -356,6 +364,143 @@ if (
       }
     } 
 
+}
+
+
+
+/********************************************** SausSensors ******************************************************************/
+void  SausSensors_OnClick(){     
+   switch(pozicija){
+        case 0:  //Atgriežamies neko nesaglabājot
+          Menu_AktivaIzvelne=Galvena;        
+        
+          break;
+        
+           case 1:        
+          laboPoziciju=!laboPoziciju;
+          counter=0;
+            if(laboPoziciju){
+              lcd.blink();
+            } else {
+              lcd.noBlink();
+            } 
+          break;
+       
+        case 2: // Saglabā ja ir OK
+          laboPoziciju=false;
+          if( skaitlis1>=0 && skaitlis1<=1023 
+          ){     
+               
+                if(
+                  parametri.SausSensors!=skaitlis1 
+                ) {                   
+                  parametri.SausSensors=skaitlis1;
+                  param_Saglabat();
+                }
+              DatiSaglabatiVeiksmigi();
+          }
+          else {
+               NepareizasVertibas();
+                Zime_SausSensors(); //Pārzīmē ekrānu
+          }        
+
+          break;
+
+        default:
+          //Vērtība pāri robezām
+          pozicija=0;
+          laboPoziciju=false;
+          break;
+      }      
+}
+
+void  Zime_SausSensors(){
+    if(Menu_IeprieksejaIzvelne!= SausSensors ){    
+            
+            param_Nolasit();          
+            skaitlis1=parametri.SausSensors;
+      
+              //Pārbauda vai mitrums ir nomālā diapazonā
+            if(skaitlis1>1023 ||skaitlis1<0 ){
+              skaitlis1 = 150;//noklusētā vērtība 80 %
+            }            
+            
+            pozicija=0;
+            pozicijaVeca=0;
+            laboPoziciju=false;      
+       
+            Menu_IeprieksejaIzvelne=ZemesMitrums;
+            counter=0;   
+            lcd.clear();
+      
+            skaitlis1Vecais=-500;
+        
+            lcd.setCursor(0,0);
+            lcd.write(byte(BultaAtpakal));
+            lcd.print(" Saus sensors  ");   
+
+            lcd.setCursor(15,0);
+            lcd.write(byte(Zivs));        
+
+            lcd.cursor(); 
+            lcd.noBlink();
+    }
+    if(pozicija>3 && pozicija<0){
+        pozicija=0;
+      }
+       
+    if(laboPoziciju && counter!=0){
+     
+        switch(pozicija){       
+          case 1: //mitrums
+            skaitlis1+=counter;
+            counter=0;
+            if(skaitlis1<0) {              
+              skaitlis1=0;
+            }
+            if(skaitlis1>100) {
+              skaitlis1=100;
+            }
+            break;       
+        
+          default:     
+            break;
+        }
+      
+
+    } else {
+      MainaKursoraPozicijuLoga(3);    
+    }
+ 
+
+if (
+      skaitlis1Vecais!=skaitlis1 ||       
+      pozicijaVeca!=pozicija  
+      ) {
+        //Zīmējam ja ir izmaiņas
+      skaitlis1Vecais=skaitlis1; 
+      pozicijaVeca=pozicija;        
+
+        lcd.setCursor(0,1);
+        lcd.print("                ");
+        lcd.setCursor(1,1);
+        lcd.print(skaitlis1);
+        
+        switch(pozicija){
+          case 0: 
+            lcd.setCursor(0,0);
+            break;
+          case 1:
+          lcd.setCursor(4,1);
+            break;
+          case 2:
+            lcd.setCursor(15,0);
+            break;          
+          
+          default:           
+            break;
+        }
+      }   
 }
 
 
@@ -1832,113 +1977,76 @@ void updateEncoder()
                                                                         DarbibuIeslegsana
 *********************************************************************************************************************************************************************************/
 
-
+int pedejoReiziParbaudijaMitrumu=-1;
+bool lielaGaisma=false;
+int beigtSuknet=-100;
 
 void DarbibuIeslegsana() 
 {
-  
-  /*  int minutesNoDienasSakuma = now.hour()*60+now.minute();
-    //pārbauda vai jābaro
-     if (pedejaBarosana != now.day()) {
-          //" P O T C P S Sv 
-          uint8_t nedelasDiena=now.dayOfTheWeek()-1;
-          if(nedelasDiena=0){
-            //Angļu svētdiena
-            nedelasDiena=6;
-          } else {
-            nedelasDiena--;        
-          }                   
-          uint8_t ndParbauditajs=1;
-          for(uint8_t nd=0; nd<7; nd++)
-          {         
-              uint8_t rez=BaroNedelasDienas & ndParbauditajs;
-              if(rez!=0  && nd==nedelasDiena) {
-                if( parametri.Barosana_Stundas*60 +  parametri.Barosana_Minutes< minutesNoDienasSakuma ){
-                    SaktBarotFunkcija();
-                 
-                  }
-              } 
-              ndParbauditajs=ndParbauditajs*2;          
-          } 
-    }
-
+   int minutesNoDienasSakuma = now.hour()*60 + now.minute();
+   int sekuundesNoDienasSakuma =minutesNoDienasSakuma *60 + now.second();
     //giasma
-    bool mazaGaisma = false;
-    bool lielaGaisma = false;
-    dienaaktsDala=0;
+    bool auguGaisma = false; 
+     bool ventilators = false; 
+   
 
-    if( parametri.Saullekts_Stundas*60 +  parametri.Saullekts_Minutes< minutesNoDienasSakuma ){  
-      mazaGaisma=true;
-      dienaaktsDala++;
-    }
-
-    if( parametri.Diena_Stundas*60 +  parametri.Diena_Minutes< minutesNoDienasSakuma ){
-      lielaGaisma=true;
-      dienaaktsDala++;
-    }
-
-    if( parametri.Saulriets_Stundas*60 +  parametri.Saulriets_Minutes< minutesNoDienasSakuma ){
-      lielaGaisma=false;
-      dienaaktsDala++;
+    if( parametri.Diena_Stundas*60 +  parametri.Diena_Minutes< minutesNoDienasSakuma ){  
+      auguGaisma=true;   
     }
 
     if( parametri.Nakts_Stundas*60 +  parametri.Nakts_Minutes< minutesNoDienasSakuma ){
-      mazaGaisma=false;
-      dienaaktsDala=0;
+      auguGaisma=false;    
     }
+ 
+ 
 
-    if( mazaGaisma){
+    if( auguGaisma){
       digitalWrite(RelejaPins_AugGaisma, LOW );
     } else {
       digitalWrite(RelejaPins_AugGaisma, HIGH);
     }
 
-    if( lielaGaisma){
+    if(tempKaste< parametri.Temp - parametri.TempTrauksme){
       digitalWrite(RelejaPins_TempGaisma, LOW);
-    } else {
-      digitalWrite(RelejaPins_TempGaisma, HIGH);
-    }
-    
-    //CO2
-    co2=false;
-    if(parametri.CO2Izmatosana){
-        if( parametri.CO2On_Stundas*60 +  parametri.CO2On_Minutes< minutesNoDienasSakuma ){
-          co2=true;
-        }
-
-        if( parametri.CO2Off_Stundas*60 +  parametri.CO2Off_Minutes< minutesNoDienasSakuma ){
-          co2=false;
-        }
-    }
-    if( co2){
-      digitalWrite(RelejaPins_CO, LOW);
-    } else {
-      digitalWrite(RelejaPins_CO, HIGH);
-    }
-
-
-    //Temperatūra 
-
-    if(tempKaste< parametri.Temp +parametri.TempTrauksme-2){
-      digitalWrite(RelejaPins_Silditajs, LOW);
-      silditajs=true;
+      lielaGaisma=true;
     } 
-    if(tempKaste> parametri.Temp +parametri.TempTrauksme){ {
-      digitalWrite(RelejaPins_Silditajs, HIGH);
-      silditajs=false;
+    if(tempKaste> parametri.Temp && lielaGaisma){ 
+      digitalWrite(RelejaPins_TempGaisma, HIGH);
+      lielaGaisma=false;
     }
 
-    if(
-      tempKaste< parametri.Temp - parametri.TempTrauksme
-      ||
-      tempKaste> parametri.Temp + parametri.TempTrauksme
-      ){
-        tempTrauksme=true;
-      }  else 
-      {
-        tempTrauksme=false;
-      }
-  } */
+
+   if(tempKaste> parametri.Temp + parametri.TempTrauksme){   
+      ventilators=true;
+    }
+   if(mitrumsIstaba> parametri.Mit_gais_max){     
+      ventilators=true;
+    }
+
+   if( ventilators){
+      digitalWrite(RelejaPins_AugGaisma, LOW );
+    } else {
+      digitalWrite(RelejaPins_AugGaisma, HIGH);
+    }
+
+     
+    if( (minutesNoDienasSakuma%10==0) && 
+        pedejoReiziParbaudijaMitrumu!=minutesNoDienasSakuma){
+          //reizi 10 minūtēs
+          pedejoReiziParbaudijaMitrumu=minutesNoDienasSakuma;
+          if(humZeme<parametri.Mit_zeme_min){
+            //sakam laistīt
+            beigtSuknet=sekuundesNoDienasSakuma+parametri.SuknisOn;
+          }
+    }
+
+    if(beigtSuknet>sekuundesNoDienasSakuma){
+      //Iesledz sukni
+      digitalWrite(RelejaPins_H2O, LOW);
+    } else {
+      digitalWrite(RelejaPins_H2O, HIGH);
+      beigtSuknet=-100; //Lai neieslēdzas nakamajā diennaktī
+    } 
 }
 
 /*********************************************************************************************************************************************************************************
