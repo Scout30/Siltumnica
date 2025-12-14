@@ -1477,7 +1477,7 @@ void  ZimePamatlogu(){
   displajaLaikaApdeitsVeiks=mi;  
 
 // Fona gaismas uztādīšana
-if(gaismaEkranam> mi || tempTrauksme){
+if(gaismaEkranam> mi  ){
   //Nav pienāci laiks aptumšot ekrānu vai trauksme
   fonaGaisma=true;
   } else {
@@ -1531,34 +1531,49 @@ if(gaismaEkranam> mi || tempTrauksme){
 //*********************************************************  Poga_OnClick *******************************************************************************//
 //Vadības pogas klikška apstrāda atbilstoši iekārtas stāvoklim
 void Poga_OnClick(){
-  gaismaEkranam= millis() + 60*1000; //Ieslēdzam ekrāna gaismu uz 60 sekundēm
-
+  if(!fonaGaisma){
+    gaismaEkranam= millis() + 120000; //Ieslēdzam ekrāna gaismu uz 120 sekundēm   
+  }
   switch(Menu_AktivaIzvelne){
     case Galvena:
        Menu_AktivaIzvelne=Menu;
        return;
     case DatumsLaiks:
         DatumsUnLaiks_OnClick();
+        fonaGaisma=true;
         return;
     case Nakts:
        Nakts_OnClick();
+        fonaGaisma=true;
        return;
     case Diena:
        Diena_OnClick();
+       fonaGaisma=true;
        return;
     case ZemesMitrums:
        ZemesMitrums_OnClick();
+        fonaGaisma=true;
         return;
     case  GaisaMitrums:
         GaisaMitrums_OnClick();
+        fonaGaisma=true;
         return;
     case Temperatura:
       Temperatura_OnClick();
+       fonaGaisma=true;
       return;
     case Menu:
+    /*  DatumsLaiks=10,
+        Diena=20,
+        Nakts=30,
+        ZemesMitrums=40,
+        GaisaMitrums=50,
+        Temperatura=60,
+        Suknis=70,
+        SausSensors=80*/
        switch (Menu_KursoraPozicija){
           case 0:
-          case 7:
+          case 9:
             Menu_AktivaIzvelne=Galvena;
             return;
           case 1:
@@ -1571,14 +1586,20 @@ void Poga_OnClick(){
             Menu_AktivaIzvelne=Nakts;
             return;
           case 4:
-            Menu_AktivaIzvelne=Temperatura;
-            return;
-          case 5:
             Menu_AktivaIzvelne=ZemesMitrums;
             return;
-          case 6:
+          case 5:
             Menu_AktivaIzvelne=GaisaMitrums;
+            return;        
+          case 6:
+            Menu_AktivaIzvelne=Temperatura;
+            return;        
+          case 7:
+            Menu_AktivaIzvelne=Suknis;
             return;
+          case 8:
+            Menu_AktivaIzvelne=SausSensors;
+            return;           
           
         default:
           Menu_AktivaIzvelne=Galvena;
@@ -1903,7 +1924,8 @@ void DHT_setup() {
 static bool measure_environment() {
   //https://github.com/adafruit/DHT-sensor-library/blob/master/examples/DHT_Unified_Sensor/DHT_Unified_Sensor.ino
     static unsigned long measurement_timestamp = millis();
-    
+       
+
     if (millis() - measurement_timestamp > 8000ul) {
         
         sensor_t sensor;      
@@ -2144,36 +2166,34 @@ fonaGaismaUzstaditaVertiba=true;
 
 void loop()
 {
-    
+  // nolasa pulksteni       
+  now = pulkstenis.now();
+
  // DHT nedarbijas, iespējams sensora bojājuma dēļ, tādēļ izkomentēts
  measure_environment();
  humZeme=ZemesMitrumaNolasisana();
 //Mēra temperaturu  
 sensors.requestTemperatures();     
 tempKaste=sensors.getTempCByIndex(0);   
-  
-// nolasa pulksteni       
-now = pulkstenis.now();
-
-DarbibuIeslegsana();
+   
+ 
 Ekrans();
  if (Enkoders()){
     Poga_OnClick();
  }  
 DarbibuIeslegsana();
-delay(2);   //Nogaida 2 milisekundes katrā ciklā, lai paspēj kontakti nodzirksteļot un nomierināties
 
-/*
+ 
 //  Izkoomentēts, lai prezentējot prototipu neizslēgtos ekrana apgasmojums
-if(fonaGaismaUzstaditaVertiba!=fonaGaisma){
+ 
  //Maina fona gaismu, ja tā nav uztādīta atbilstoši vajadzībai
   if(fonaGaisma){
       lcd.backlight();
   } else {
-     // lcd.noBacklight();
+     lcd.noBacklight();
   }
-  fonaGaismaUzstaditaVertiba=fonaGaisma;
-}
-*/
+ 
+ 
+ 
  
 }
