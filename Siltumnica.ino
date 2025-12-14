@@ -41,10 +41,11 @@ static const int Enkoders_CLK = 4;
 static const int Enkoders_DT = 3;                                    
 static const int Enkoders_SW = 2; 
 
-static const int RelejaPins_AugGaisma = 6;
-static const int RelejaPins_TempGaisma = 7;
-static const int RelejaPins_Vent = 8;
-static const int RelejaPins_H2O = 9;
+static const int RelejaPins_AugGaisma = 8;  
+static const int RelejaPins_TempGaisma = 9;
+static const int RelejaPins_Vent = 7;
+static const int RelejaPins_H2O = 6;
+
 
 //#define DHT_SENSOR_TYPE DHT_TYPE_21
 //#define DHT_SENSOR_TYPE DHT_TYPE_22
@@ -1921,12 +1922,13 @@ void DHT_setup() {
   }
 }
 
+static unsigned long measurement_timestamp = millis(); 
 static bool measure_environment() {
   //https://github.com/adafruit/DHT-sensor-library/blob/master/examples/DHT_Unified_Sensor/DHT_Unified_Sensor.ino
-    static unsigned long measurement_timestamp = millis();       
+        
 
     if (millis() - measurement_timestamp > 40000ul) {
-        
+         measurement_timestamp = millis(); 
         sensor_t sensor;      
         dht.humidity().getSensor(&sensor); 
         delayMS = sensor.min_delay / 1000;
@@ -2020,71 +2022,73 @@ int beigtSuknet=-100;
 
 void DarbibuIeslegsana() 
 {
+    
 
-   int minutesNoDienasSakuma = now.hour()*60 + now.minute();
-   int sekuundesNoDienasSakuma =minutesNoDienasSakuma *60 + now.second();
-    //giasma
-    bool auguGaisma = false; 
-    bool ventilators = false; 
-   
+      int minutesNoDienasSakuma = now.hour()*60 + now.minute();
+      int sekuundesNoDienasSakuma =minutesNoDienasSakuma *60 + now.second();
+        //giasma
+        bool auguGaisma = false; 
+        bool ventilators = false; 
+      
 
-    if( parametri.Diena_Stundas*60 +  parametri.Diena_Minutes< minutesNoDienasSakuma ){  
-      auguGaisma=true;   
-    }
+        if( parametri.Diena_Stundas*60 +  parametri.Diena_Minutes< minutesNoDienasSakuma ){  
+          auguGaisma=true;   
+        }
 
-    if( parametri.Nakts_Stundas*60 +  parametri.Nakts_Minutes< minutesNoDienasSakuma ){
-      auguGaisma=false;    
-    }
- 
- 
+        if( parametri.Nakts_Stundas*60 +  parametri.Nakts_Minutes< minutesNoDienasSakuma ){
+          auguGaisma=false;    
+        }
+    
+    
 
-    if( auguGaisma){
-      digitalWrite(RelejaPins_AugGaisma, LOW );
-    } else {
-      digitalWrite(RelejaPins_AugGaisma, HIGH);
-    }
+        if( auguGaisma){
+          digitalWrite(RelejaPins_AugGaisma, LOW );
+        } else {
+          digitalWrite(RelejaPins_AugGaisma, HIGH);
+        }
 
-    if(tempKaste< parametri.Temp - parametri.TempTrauksme){
-      digitalWrite(RelejaPins_TempGaisma, LOW);
-      lielaGaisma=true;
-    } 
-    if(tempKaste> parametri.Temp && lielaGaisma){ 
-      digitalWrite(RelejaPins_TempGaisma, HIGH);
-      lielaGaisma=false;
-    }
+        if(tempKaste< parametri.Temp - parametri.TempTrauksme){
+          digitalWrite(RelejaPins_TempGaisma, LOW);
+          lielaGaisma=true;
+        } 
+        if(tempKaste> parametri.Temp && lielaGaisma){ 
+          digitalWrite(RelejaPins_TempGaisma, HIGH);
+          lielaGaisma=false;
+        }
 
 
-   if(tempKaste> parametri.Temp + parametri.TempTrauksme){   
-      ventilators=true;
-    }
-   if(mitrumsIstaba> parametri.Mit_gais_max){     
-      ventilators=true;
-    }
+      if(tempKaste> parametri.Temp + parametri.TempTrauksme){   
+          ventilators=true;
+        }
+      if(mitrumsIstaba> parametri.Mit_gais_max){     
+          ventilators=true;
+        }
 
-   if( ventilators){
-      digitalWrite(RelejaPins_AugGaisma, LOW );
-    } else {
-      digitalWrite(RelejaPins_AugGaisma, HIGH);
-    }
+      if( ventilators){
+          digitalWrite(RelejaPins_AugGaisma, LOW );
+        } else {
+          digitalWrite(RelejaPins_AugGaisma, HIGH);
+        }
 
-     
-    if( (minutesNoDienasSakuma%10==0) && 
-        pedejoReiziParbaudijaMitrumu!=minutesNoDienasSakuma){
-          //reizi 10 minūtēs
-          pedejoReiziParbaudijaMitrumu=minutesNoDienasSakuma;
-          if(humZeme<parametri.Mit_zeme_min){
-            //sakam laistīt
-            beigtSuknet=sekuundesNoDienasSakuma+parametri.SuknisOn;
-          }
-    }
+        
+        if( (minutesNoDienasSakuma%10==0) && 
+            pedejoReiziParbaudijaMitrumu!=minutesNoDienasSakuma){
+              //reizi 10 minūtēs
+              pedejoReiziParbaudijaMitrumu=minutesNoDienasSakuma;
+              if(humZeme<parametri.Mit_zeme_min){
+                //sakam laistīt
+                beigtSuknet=sekuundesNoDienasSakuma+parametri.SuknisOn;
+              }
+        }
 
-    if(beigtSuknet>sekuundesNoDienasSakuma){
-      //Iesledz sukni
-      digitalWrite(RelejaPins_H2O, LOW);
-    } else {
-      digitalWrite(RelejaPins_H2O, HIGH);
-      beigtSuknet=-100; //Lai neieslēdzas nakamajā diennaktī
-    } 
+        if(beigtSuknet>sekuundesNoDienasSakuma){
+          //Iesledz sukni
+          digitalWrite(RelejaPins_H2O, LOW);
+        } else {
+          digitalWrite(RelejaPins_H2O, HIGH);
+          beigtSuknet=-100; //Lai neieslēdzas nakamajā diennaktī
+        } 
+    
 }
 
 /*********************************************************************************************************************************************************************************
@@ -2105,12 +2109,12 @@ void setup()
     pinMode(RelejaPins_Vent,OUTPUT);
     pinMode(RelejaPins_H2O,OUTPUT);
    
-    digitalWrite(RelejaPins_AugGaisma, HIGH);
-    digitalWrite(RelejaPins_TempGaisma, HIGH);
-    digitalWrite(RelejaPins_Vent, HIGH);
-    digitalWrite(RelejaPins_H2O, HIGH);
+    digitalWrite(RelejaPins_AugGaisma, HIGH); 
+    digitalWrite(RelejaPins_TempGaisma, HIGH); 
+    digitalWrite(RelejaPins_Vent, HIGH); 
+    digitalWrite(RelejaPins_H2O, HIGH); 
  
-
+  
     lastStateCLK = digitalRead(Enkoders_CLK);
     btnStateLast=digitalRead(Enkoders_SW);
 
@@ -2153,6 +2157,7 @@ tempKaste=0;
 
  
  // DHT nedarbojas, iespējams sensora bojājuma dēļ, tādēļ izkomentēts
+ measurement_timestamp = millis(); 
  DHT_setup();
  dht.begin();
  humZeme=0;
