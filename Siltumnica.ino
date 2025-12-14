@@ -1598,14 +1598,26 @@ void Poga_OnClick(){
 int ZimeMenu_Nobide;
 int ZimeMenu_VecaisLogs;
 int ZimeMenu_NobideVeca;
- String   menuPunkti[8]={
+
+/*DatumsLaiks=10,
+  Diena=20,
+  Nakts=30,
+  ZemesMitrums=40,
+  GaisaMitrums=50,
+  Temperatura=60,
+  Suknis=70,
+  SausSensors=80*/
+
+ String   menuPunkti[10]={
       "<--Atgriesties  ",
       "Datums un laiks ",
       "Diena           ",  
       "Nakts           ", 
-      "Temperatura     ",
       "Zemes mitrums   ",
-      "Gaisa mitrums   ",
+      "Gaisa mitrums   ",      
+      "Temperatura     ",    
+      "Suknis          ",
+      "Saus sensors    ",      
       "<--Atgriesties  "} ; 
 
 void ZimeMenuArGarumzimem(int rinda, int menuPunkts){
@@ -1615,10 +1627,14 @@ void ZimeMenuArGarumzimem(int rinda, int menuPunkts){
   
        switch (menuPunkts){        
 
-          case 5: //Temperatura
+          case 6: //Temperatura
              lcd.setCursor(8,rinda);
              lcd.write(byte(Garais_uu));
             return;      
+          case 7: //Temperatura
+             lcd.setCursor(2,rinda);
+             lcd.write(byte(Garais_uu));
+            return;   
           
         default:        
           break;
