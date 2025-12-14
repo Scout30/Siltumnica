@@ -18,6 +18,7 @@
 //#define DHT_SENSOR_TYPE DHT_TYPE_11
 #define DHTTYPE    DHT11     // DHT 11
 
+
 #define GaraisMazais_ee 1
 #define GaraisMazais_aa B11100001
 #define Latviesu_sh 2
@@ -34,7 +35,7 @@
 // Konfigurē viena vada interfeisu DallasTemperature instrumentiem
 OneWire oneWire(DallasTemperatureSensors);
 DallasTemperature sensors(&oneWire);
-
+const int zemesMitrumaPins=A0;
 
 static const int Enkoders_CLK = 4;
 static const int Enkoders_DT = 3;                                    
@@ -65,7 +66,7 @@ unsigned long barosanaOn = 0; ///TODO
 float temperature;
 float humidity; 
 
-float humZeme;
+int humZeme;
 float tempKaste;
 
 bool tempTrauksme=false;
@@ -128,6 +129,17 @@ Menu_Izvelnes Menu_IeprieksejaIzvelne=-1;
 int Menu_KursoraPozicija=0;
 int Menu_MinVertiba=0;
 int Menu_MaxVertiba=0;
+
+
+int ZemesMitrumaNolasisana() {
+  int dati = analogRead(zemesMitrumaPins); // 0-1023
+  
+  int procents = map(dati, 1023/*max vētība*/, 300 /* saus sensors */, 0 /*%*/, 100/*%*/); 
+  if (procents < 0) procents = 0;
+  if (procents > 100) procents = 100;
+  return procents;
+}
+
 
 void Ekrans(){
 
@@ -1352,7 +1364,7 @@ if(gaismaEkranam> mi || tempTrauksme){
       lcd.print(sekundes);
   }
   lcd.print(" ");
-  lcd.print(humZeme,1);       
+  lcd.print(humZeme);       
   lcd.print("% zeme ");  
 
 
@@ -1730,15 +1742,10 @@ void DHT_setup() {
 static bool measure_environment() {
   //https://github.com/adafruit/DHT-sensor-library/blob/master/examples/DHT_Unified_Sensor/DHT_Unified_Sensor.ino
     static unsigned long measurement_timestamp = millis();
-
-    /* Measure once every four seconds. */
+    
     if (millis() - measurement_timestamp > 8000ul) {
         
-
-      //dht.begin();
-      
-        sensor_t sensor;
-      
+        sensor_t sensor;      
         dht.humidity().getSensor(&sensor); 
         delayMS = sensor.min_delay / 1000;
       
@@ -1748,20 +1755,18 @@ static bool measure_environment() {
         dht.temperature().getEvent(&event);
         if (!isnan(event.temperature)) {   
           temperaturaIstaba=event.temperature;
-          Serial.print(F("Temperature: "));    
-          Serial.print(temperaturaIstaba);
-          Serial.println(F("°C"));
+          //Serial.print(F("Temperature: "));    
+          //Serial.print(temperaturaIstaba);
+          //Serial.println(F("°C"));
         }
         // Get humidity event and print its value.
         dht.humidity().getEvent(&event);
         if (!isnan(event.relative_humidity)) {
               humidity=event.relative_humidity;
-              Serial.print(F("Humidity: "));
-              Serial.print(humidity);
-              Serial.println(F("%"));
+            //  Serial.print(F("Humidity: "));
+            //  Serial.print(humidity);
+            //  Serial.println(F("%"));
         } 
-   } else {
-      Serial.println("Nelasa mitrumu");
    }
 }
     
@@ -2003,7 +2008,8 @@ fonaGaismaUzstaditaVertiba=true;
  
  // DHT nedarbojas, iespējams sensora bojājuma dēļ, tādēļ izkomentēts
  DHT_setup();
- //dht.begin();
+ dht.begin();
+ humZeme=0;
 }
 
 /*********************************************************************************************************************************************************************************
@@ -2017,12 +2023,11 @@ void loop()
     
  // DHT nedarbijas, iespējams sensora bojājuma dēļ, tādēļ izkomentēts
  measure_environment();
- 
+ humZeme=ZemesMitrumaNolasisana();
 //Mēra temperaturu  
 sensors.requestTemperatures();     
 tempKaste=sensors.getTempCByIndex(0);   
-  //Serial.print("situms kastē: ");
-  //Serial.println(tempKaste);
+  
 // nolasa pulksteni       
 now = pulkstenis.now();
 
