@@ -293,7 +293,7 @@ void  Zime_Laiku(String virsraksts, Menu_Izvelnes ativaizvelne, int stundas, int
         }
 
     } else {
-      MainaKursoraPozicijuLoga(2);
+      MainaKursoraPozicijuLoga(3);
     }
 
 if (
@@ -351,11 +351,11 @@ if (
 void  ZemesMitrums_OnClick(){     
    switch(pozicija){
         case 0:  //Atgriežamies neko nesaglabājot
-          Menu_AktivaIzvelne=Galvena;       
+          Menu_AktivaIzvelne=Galvena;        
         
           break;
         
-        case 1: 
+           case 1:        
           laboPoziciju=!laboPoziciju;
           counter=0;
             if(laboPoziciju){
@@ -424,7 +424,7 @@ void  Zime_ZemesMitrums(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>2 && pozicija<0){
+    if(pozicija>3 && pozicija<0){
         pozicija=0;
       }
        
@@ -448,7 +448,7 @@ void  Zime_ZemesMitrums(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(2);    
+      MainaKursoraPozicijuLoga(3);    
     }
  
 
@@ -491,9 +491,7 @@ void  GaisaMitrums_OnClick(){
           Menu_AktivaIzvelne=Galvena;        
         
           break;
- 
-       
-        case 1: 
+          case 1:        
           laboPoziciju=!laboPoziciju;
           counter=0;
             if(laboPoziciju){
@@ -502,7 +500,7 @@ void  GaisaMitrums_OnClick(){
               lcd.noBlink();
             } 
           break;
-
+       
         case 2: // Saglabā ja ir OK
           laboPoziciju=false;
           if( skaitlis1>=0 && skaitlis1<=100 
@@ -562,7 +560,7 @@ void  Zime_GaisaMitrums(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>2 && pozicija<0){
+    if(pozicija>3 && pozicija<0){
         pozicija=0;
       }
        
@@ -586,7 +584,7 @@ void  Zime_GaisaMitrums(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(2);    
+      MainaKursoraPozicijuLoga(3);    
     }
  
 
@@ -629,8 +627,7 @@ void  Suknis_OnClick(){
           Menu_AktivaIzvelne=Galvena;        
         
           break;
-        
-        case 1: 
+         case 1:        
           laboPoziciju=!laboPoziciju;
           counter=0;
             if(laboPoziciju){
@@ -639,7 +636,6 @@ void  Suknis_OnClick(){
               lcd.noBlink();
             } 
           break;
-
        
         case 2: // Saglabā ja ir OK
           laboPoziciju=false;
@@ -704,7 +700,7 @@ void  Zime_Suknis(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>2 && pozicija<0){
+    if(pozicija>3 && pozicija<0){
         pozicija=0;
       }
        
@@ -728,7 +724,7 @@ void  Zime_Suknis(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(2);    
+      MainaKursoraPozicijuLoga(3);    
     }
  
 
@@ -867,7 +863,7 @@ void  Zime_Temperatura(){
             lcd.cursor(); 
             lcd.noBlink();
     }
-    if(pozicija>3 && pozicija<0){
+    if(pozicija>4 && pozicija<0){
         pozicija=0;
       }
        
@@ -902,7 +898,7 @@ void  Zime_Temperatura(){
       
 
     } else {
-      MainaKursoraPozicijuLoga(3);    
+      MainaKursoraPozicijuLoga(4);    
     }
  
 
@@ -1355,7 +1351,7 @@ if(gaismaEkranam> mi || tempTrauksme){
       }
       lcd.print(sekundes);
   }
-
+  lcd.print(" ");
   lcd.print(humZeme,1);       
   lcd.print("% zeme ");  
 
@@ -1369,7 +1365,7 @@ if(gaismaEkranam> mi || tempTrauksme){
   lcd.print(tempKaste, 1);
   lcd.print("C            ");
 
-  lcd.setCursor(7,1);
+  lcd.setCursor(9,1);
   lcd.print(humidity, 1);
   lcd.print("% gais   ");
 
@@ -1670,10 +1666,10 @@ void param_Saglabat(){
 
 
  //****************************************************************************** DHT izstabas mitruma un temperatūras sensors ******************************************//
-/*
-DHT sensora inicialzēšana lai notestētu tā darebību
-Iespējams DHT sensora fizisks bojājums, tāpēc atstāju oficiālo debuga kodu didliotekai, lai varētu notestēt, kad būs iespējams nomainīt sensoru
 
+//DHT sensora inicialzēšana lai notestētu tā darebību
+//Iespējams DHT sensora fizisks bojājums, tāpēc atstāju oficiālo debuga kodu didliotekai, lai varētu notestēt, kad būs iespējams nomainīt sensoru
+ 
 uint32_t delayMS;
 void DHT_setup() {
  // Serial.begin(9600);
@@ -1704,6 +1700,7 @@ void DHT_setup() {
   Serial.println(F("------------------------------------"));
   // Set delay between sensor readings based on sensor details.
    delayMS = sensor.min_delay / 1000;
+
  Serial.print  (F("Sensor delay: ")); Serial.println(delayMS);
    delay(delayMS*5);
   // Get temperature event and print its value.
@@ -1729,31 +1726,42 @@ void DHT_setup() {
     Serial.println(F("%"));
   }
 }
-*/
+
 static bool measure_environment() {
   //https://github.com/adafruit/DHT-sensor-library/blob/master/examples/DHT_Unified_Sensor/DHT_Unified_Sensor.ino
     static unsigned long measurement_timestamp = millis();
 
     /* Measure once every four seconds. */
     if (millis() - measurement_timestamp > 8000ul) {
-   
+        
+
+      //dht.begin();
+      
+        sensor_t sensor;
+      
+        dht.humidity().getSensor(&sensor); 
+        delayMS = sensor.min_delay / 1000;
+      
+        delay(delayMS*5); 
         sensors_event_t event;
+        
         dht.temperature().getEvent(&event);
-
-        if (isnan(event.temperature) ) {       
-            temperaturaIstaba=0; 
+        if (!isnan(event.temperature)) {   
+          temperaturaIstaba=event.temperature;
+          Serial.print(F("Temperature: "));    
+          Serial.print(temperaturaIstaba);
+          Serial.println(F("°C"));
         }
-        else {
-              temperaturaIstaba=event.temperature;
-        }
+        // Get humidity event and print its value.
         dht.humidity().getEvent(&event);
-        if ( isnan(event.relative_humidity)) {              
-              mitrumsIstaba=0; 
-        }
-        else {       
-              mitrumsIstaba=event.relative_humidity;            
-        }
-
+        if (!isnan(event.relative_humidity)) {
+              humidity=event.relative_humidity;
+              Serial.print(F("Humidity: "));
+              Serial.print(humidity);
+              Serial.println(F("%"));
+        } 
+   } else {
+      Serial.println("Nelasa mitrumu");
    }
 }
     
@@ -1935,7 +1943,7 @@ void DarbibuIeslegsana()
 void setup()
 {
   Serial.begin(9600);
-  Serial.println("Advarija debuga informācija");
+  Serial.println("Siltumnīcas debuga informācija");
 //Definē arduion kontaktu pielietojumu un uzstāda sākotnējās vērtības
     pinMode(Enkoders_SW,INPUT_PULLUP);
     pinMode(Enkoders_DT,INPUT);
@@ -1994,8 +2002,8 @@ fonaGaismaUzstaditaVertiba=true;
 
  
  // DHT nedarbojas, iespējams sensora bojājuma dēļ, tādēļ izkomentēts
- //DHT_setup();
- dht.begin();
+ DHT_setup();
+ //dht.begin();
 }
 
 /*********************************************************************************************************************************************************************************
@@ -2008,12 +2016,13 @@ void loop()
 {
     
  // DHT nedarbijas, iespējams sensora bojājuma dēļ, tādēļ izkomentēts
- //measure_environment();
+ measure_environment();
  
-//Mēra temp akvārijā
+//Mēra temperaturu  
 sensors.requestTemperatures();     
 tempKaste=sensors.getTempCByIndex(0);   
-
+  //Serial.print("situms kastē: ");
+  //Serial.println(tempKaste);
 // nolasa pulksteni       
 now = pulkstenis.now();
 
