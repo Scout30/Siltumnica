@@ -459,8 +459,8 @@ void  Zime_SausSensors(){
             if(skaitlis1<0) {              
               skaitlis1=0;
             }
-            if(skaitlis1>100) {
-              skaitlis1=100;
+            if(skaitlis1>1023) {
+              skaitlis1=1023;
             }
             break;       
         
@@ -871,8 +871,8 @@ void  Zime_Suknis(){
             if(skaitlis1<0) {              
               skaitlis1=0;
             }
-            if(skaitlis1>100) {
-              skaitlis1=100;
+            if(skaitlis1>500) {
+              skaitlis1=500;
             }
             break;       
         
