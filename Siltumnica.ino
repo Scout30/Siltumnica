@@ -37,9 +37,9 @@ OneWire oneWire(DallasTemperatureSensors);
 DallasTemperature sensors(&oneWire);
 const int zemesMitrumaPins=A0;
 
-static const int Enkoders_CLK = 4;
-static const int Enkoders_DT = 3;                                    
-static const int Enkoders_SW = 2; 
+static const int Enkoders_CLK = 2;//4
+static const int Enkoders_DT = 3; //3                                   
+static const int Enkoders_SW = 4;//2 
 
 static const int RelejaPins_AugGaisma = 8;  
 static const int RelejaPins_TempGaisma = 9;
@@ -59,7 +59,7 @@ LiquidCrystal_I2C lcd(0x27,16,2);  // set the LCD address to 0x27 for a 16 chars
 RTC_DS3231 pulkstenis;                     // create rtc for the DS3231 RTC module, address is fixed at 0x68. Svarīgi lai I2C adreses nesakrīt
 //#define  pulkstenaAtmina_I2C 0x57; // Pulksteņa 32 bitu atmiņu pašlaik nelietoju, bet lai nav pēctam jāmeklē adrese sablabāju.
 
-int counter = 0;
+volatile int counter = 0;
 int currentStateCLK;
 int lastStateCLK;
 unsigned long barosanaOn = 0; ///TODO
@@ -1988,8 +1988,14 @@ static bool measure_environment() {
 }
 
 void updateEncoder()
-{
-	// Paraugs no https://lastminuteengineers.com/rotary-encoder-arduino-tutorial/
+{	
+  if(digitalRead(Enkoders_CLK)== digitalRead(Enkoders_DT)){
+    counter++;
+  } else {
+    counter--;
+  }
+  /*
+  // Paraugs no https://lastminuteengineers.com/rotary-encoder-arduino-tutorial/
   // Read the current state of CLK
 	currentStateCLK = digitalRead(Enkoders_CLK);
 
@@ -2010,6 +2016,7 @@ void updateEncoder()
 
 	// Remember last CLK state
 	lastStateCLK = currentStateCLK;
+  */
 }
 
 /*********************************************************************************************************************************************************************************
@@ -2021,8 +2028,7 @@ bool lielaGaisma=false;
 int beigtSuknet=-100;
 
 void DarbibuIeslegsana() 
-{
-    
+{    
 
       int minutesNoDienasSakuma = now.hour()*60 + now.minute();
       int sekuundesNoDienasSakuma =minutesNoDienasSakuma *60 + now.second();
@@ -2033,6 +2039,7 @@ void DarbibuIeslegsana()
 
         if( parametri.Diena_Stundas*60 +  parametri.Diena_Minutes< minutesNoDienasSakuma ){  
           auguGaisma=true;   
+
         }
 
         if( parametri.Nakts_Stundas*60 +  parametri.Nakts_Minutes< minutesNoDienasSakuma ){
@@ -2121,8 +2128,11 @@ void setup()
   // Ievades pogas enkodera piesaiste pārtraukumu (interrupt) apstrādei izsaucot updateEncoder()
 	// pārtraukums Nr 0  priekš pin 2
   // pārtraukums Nr 1 priekš  pin 3
-	attachInterrupt(0, updateEncoder, CHANGE);
-	attachInterrupt(1, updateEncoder, CHANGE);
+	//attachInterrupt(0, updateEncoder, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(Enkoders_CLK), updateEncoder, CHANGE);
+   
+
+	//attachInterrupt(1, updateEncoder, CHANGE);
 
  //LCD ekrana sagatavoošana
   lcd.init();   
