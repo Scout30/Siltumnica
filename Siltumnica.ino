@@ -2091,7 +2091,7 @@ void DarbibuIeslegsana()
       if(tempKaste> parametri.Temp + parametri.TempTrauksme){   
           ventilators=true;
         }
-      if(mitrumsIstaba> parametri.Mit_gais_max){     
+      if(humidity> parametri.Mit_gais_max){     
           ventilators=true;
         }
 
