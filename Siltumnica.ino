@@ -2096,9 +2096,9 @@ void DarbibuIeslegsana()
         }
 
       if( ventilators){
-          digitalWrite(RelejaPins_AugGaisma, LOW );
+          digitalWrite(RelejaPins_Vent, LOW );
         } else {
-          digitalWrite(RelejaPins_AugGaisma, HIGH);
+          digitalWrite(RelejaPins_Vent, HIGH);
         }
 
         
