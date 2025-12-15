@@ -1563,6 +1563,19 @@ void Poga_OnClick(){
       Temperatura_OnClick();
       // fonaGaisma=true;
       return;
+    case SausSensors:
+      SausSensors_OnClick();
+      // fonaGaisma=true;
+      return;
+    case Suknis:
+      Suknis_OnClick();
+      // fonaGaisma=true;
+      return;
+
+
+
+
+
     case Menu:
     /*  DatumsLaiks=10,
         Diena=20,
