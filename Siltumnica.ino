@@ -61,7 +61,7 @@ RTC_DS3231 pulkstenis;                     // create rtc for the DS3231 RTC modu
 
 volatile int counter = 0;
 int currentStateCLK;
-int lastStateCLK;
+volatile int lastStateCLK;
 unsigned long barosanaOn = 0; ///TODO
 
 float temperature;
@@ -1962,11 +1962,15 @@ static bool measure_environment() {
  bool Enkoders() {
   // Izmantos paraugs no https://lastminuteengineers.com/rotary-encoder-arduino-tutorial/
     // Read the button state
+  int btnState = digitalRead(Enkoders_SW);
 
-  if(digitalRead(Enkoders_SW) == LOW){
+  if(btnState == LOW && btnStateLast!=btnState){
     delay(200);
+    btnStateLast=btnState;
     return true;
   }
+  btnStateLast=btnState;
+
 /*
     int btnState = digitalRead(Enkoders_SW);
 
@@ -1983,25 +1987,25 @@ static bool measure_environment() {
 
         // Remember last button press event
         lastButtonPress = millis();
-        btnStateLast=btnState;*/
-        
+        btnStateLast=btnState;
+
         return false;
 	  }
 
   btnStateLast=btnState;
 	// Put in a slight delay to help debounce the reading
-	delay(1);
+	delay(1);*/
   return false;
 }
 
 void updateEncoder()
 {	
-  if(digitalRead(Enkoders_CLK)== digitalRead(Enkoders_DT)){
+ /* if(digitalRead(Enkoders_CLK)== digitalRead(Enkoders_DT)){
     counter++;
   } else {
     counter--;
   }
-  /*
+  */
   // Paraugs no https://lastminuteengineers.com/rotary-encoder-arduino-tutorial/
   // Read the current state of CLK
 	currentStateCLK = digitalRead(Enkoders_CLK);
@@ -2013,17 +2017,17 @@ void updateEncoder()
 		// If the DT state is different than the CLK state then
 		// the encoder is rotating CCW so decrement
 		if (digitalRead(Enkoders_DT) != currentStateCLK) {
-			counter --;    
+			counter ++;    
 		} else {
 			// Encoder is rotating CW so increment
-			counter ++;
+			counter --;
 			//currentDir ="CW";
 		} 	 
 	}
 
 	// Remember last CLK state
 	lastStateCLK = currentStateCLK;
-  */
+  
 }
 
 /*********************************************************************************************************************************************************************************
