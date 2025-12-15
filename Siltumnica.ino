@@ -1962,6 +1962,12 @@ static bool measure_environment() {
  bool Enkoders() {
   // Izmantos paraugs no https://lastminuteengineers.com/rotary-encoder-arduino-tutorial/
     // Read the button state
+
+  if(digitalRead(Enkoders_SW) == LOW){
+    delay(200);
+    return true;
+  }
+/*
     int btnState = digitalRead(Enkoders_SW);
 
     //If we detect LOW signal, button is pressed
@@ -1977,7 +1983,8 @@ static bool measure_environment() {
 
         // Remember last button press event
         lastButtonPress = millis();
-        btnStateLast=btnState;
+        btnStateLast=btnState;*/
+        
         return false;
 	  }
 
@@ -2108,8 +2115,8 @@ void setup()
   Serial.println("Siltumnīcas debuga informācija");
 //Definē arduion kontaktu pielietojumu un uzstāda sākotnējās vērtības
     pinMode(Enkoders_SW,INPUT_PULLUP);
-    pinMode(Enkoders_DT,INPUT);
-    pinMode(Enkoders_CLK,INPUT);
+    pinMode(Enkoders_DT,INPUT_PULLUP);
+    pinMode(Enkoders_CLK,INPUT_PULLUP);
     
     pinMode(RelejaPins_AugGaisma,OUTPUT);
     pinMode(RelejaPins_TempGaisma,OUTPUT);
