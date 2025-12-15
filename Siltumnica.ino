@@ -430,7 +430,7 @@ void  Zime_SausSensors(){
             pozicijaVeca=0;
             laboPoziciju=false;      
        
-            Menu_IeprieksejaIzvelne=ZemesMitrums;
+            Menu_IeprieksejaIzvelne=SausSensors;
             counter=0;   
             lcd.clear();
       
@@ -838,7 +838,7 @@ void  Zime_Suknis(){
             pozicijaVeca=0;
             laboPoziciju=false;      
        
-            Menu_IeprieksejaIzvelne=GaisaMitrums;
+            Menu_IeprieksejaIzvelne=Suknis;
             counter=0;   
             lcd.clear();
       
